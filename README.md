@@ -1,16 +1,57 @@
-# speech_helper
+# Speech Helper
 
-A new Flutter project.
+A simple and intuitive speech assistance app that helps users communicate through pre-recorded voice buttons.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- 6 Easy-to-use voice output buttons
+- High contrast design for better visibility
+- Offline functionality - no internet required
+- Simple and intuitive interface
+- Pre-recorded common phrases:
+  - Yes
+  - No
+  - Wait
+  - Stop
+  - Don't Know
+  - Don't Understand
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+[Add screenshots of your app here]
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+1. Download the latest APK from the [releases page](https://github.com/XealedX/Speech-Helper/releases)
+2. Install on your Android device
+3. Grant necessary permissions for audio playback
+
+## Building from Source
+
+Make sure you have Flutter installed on your machine. Then:
+
+```bash
+# Clone the repository
+git clone https://github.com/XealedX/Speech-Helper.git
+
+# Navigate to project directory
+cd Speech-Helper
+
+# Get dependencies
+flutter pub get
+
+# Run the app
+flutter run
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Developer
+
+Created by XealedX
