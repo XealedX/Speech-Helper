@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
   runApp(const MyApp());
 }
 
@@ -36,7 +42,17 @@ class _SpeechHelperPageState extends State<SpeechHelperPage> {
   final AudioPlayer audioPlayer = AudioPlayer();
 
   void playSound(String soundName) async {
-    await audioPlayer.play(AssetSource('sounds/$soundName.mp3'));
+    try {
+      final player = AudioPlayer();
+      await player.play(AssetSource('sounds/$soundName.mp3'));
+      
+      // Add listener for completion to dispose the player
+      player.onPlayerComplete.listen((event) {
+        player.dispose();
+      });
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
 
   Widget buildSoundButton(String text, String soundName, {
@@ -45,43 +61,66 @@ class _SpeechHelperPageState extends State<SpeechHelperPage> {
     IconData? icon
   }) {
     return Expanded(
-      flex: isLarge ? 2 : 1,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            backgroundColor: color,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15), // Increased roundness
-              side: BorderSide(color: Colors.white.withValues()), // Subtle border
-            ),
-            elevation: 4, // Added shadow
+      flex: isLarge ? 2 : 1, // Larger buttons take more space
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          backgroundColor: color,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
           ),
-          onPressed: () => playSound(soundName),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) 
-                Icon(
-                  icon,
-                  size: isLarge ? 32 : 24,
-                  color: Colors.white,
-                ),
-              if (icon != null) 
-                const SizedBox(height: 8),
-              Text(
-                text,
-                style: GoogleFonts.poppins(
-                  fontSize: isLarge ? 24 : 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-                textAlign: TextAlign.center,
+          elevation: 0,
+          minimumSize: Size.infinite,
+        ),
+        onPressed: () => playSound(soundName),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) 
+              Stack(
+                children: [
+                  // Outline effect for icon
+                  Icon(
+                    icon,
+                    size: isLarge ? 65 : 50, // Larger icons for large buttons
+                    color: Colors.black,
+                  ),
+                ],
               ),
-            ],
-          ),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: isLarge ? 65 : 50, // Larger text for large buttons
+                color: Colors.black,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.5,
+                shadows: [
+                  // Text outline effect
+                  Shadow(
+                    offset: const Offset(-1.5, -1.5),
+                    color: Colors.white,
+                    blurRadius: 0,
+                  ),
+                  Shadow(
+                    offset: const Offset(1.5, -1.5),
+                    color: Colors.white,
+                    blurRadius: 0,
+                  ),
+                  Shadow(
+                    offset: const Offset(1.5, 1.5),
+                    color: Colors.white,
+                    blurRadius: 0,
+                  ),
+                  Shadow(
+                    offset: const Offset(-1.5, 1.5),
+                    color: Colors.white,
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
@@ -90,86 +129,61 @@ class _SpeechHelperPageState extends State<SpeechHelperPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0, // Removes shadow
-        title: Text(
-          'SPEECH HELPER',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-            fontSize: 22,
-          ),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Top row with main action buttons
-            Expanded(
-              flex: 3, // Increased flex for more height
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Row(
-                  children: [
-                    buildSoundButton(
-                      'Ya', 
-                      'ya', 
-                      isLarge: true, 
-                      color: Colors.green[600],
-                      icon: Icons.check_circle_outline,
-                    ),
-                    const SizedBox(width: 16.0), // Add spacing between buttons
-                    buildSoundButton(
-                      'Ngakk', 
-                      'gak', 
-                      isLarge: true, 
-                      color: Colors.red[600],
-                      icon: Icons.cancel_outlined,
-                    ),
-                  ],
+      body: Column(
+        children: [
+          Expanded(
+            flex: 3, // Larger space for first row
+            child: Row(
+              children: [
+                buildSoundButton(
+                  'YA', 
+                  'ya',
+                  color: const Color(0xFF00FF77),
+                  icon: Icons.check_circle_outline,
+                  isLarge: true, // Mark as large button
                 ),
-              ),
+                buildSoundButton(
+                  'NGAKK', 
+                  'gak',
+                  color: const Color(0xFFFF4444),
+                  icon: Icons.cancel_outlined,
+                  isLarge: true, // Mark as large button
+                ),
+                buildSoundButton(
+                  'GAK PAHAM',
+                  'gak_paham', 
+                  color: const Color(0xFF00FFFF), // Pure bright orange
+                  icon: Icons.psychology_outlined,
+                ),
+              ],
             ),
-            // Bottom row with other buttons
-            Expanded(
-              flex: 2, // Adjusted flex ratio
-              child: Row(
-                children: [
-                  buildSoundButton(
-                    'Tunggu', 
-                    'tunggu', 
-                    color: Colors.orange[700],
-                    icon: Icons.timer,
-                  ),
-                  const SizedBox(width: 8.0),
-                  buildSoundButton(
-                    'Berhenti', 
-                    'berhenti', 
-                    color: Colors.purple[600],
-                    icon: Icons.stop_circle_outlined,
-                  ),
-                  const SizedBox(width: 8.0),
-                  buildSoundButton(
-                    'Tidak Tahu', 
-                    'gak_tahu', 
-                    color: Colors.blue[600],
-                    icon: Icons.question_mark_rounded,
-                  ),
-                  const SizedBox(width: 8.0),
-                  buildSoundButton(
-                    'Tidak Paham', 
-                    'gak_paham', 
-                    color: Colors.brown[600],
-                    icon: Icons.psychology_outlined,
-                  ),
-                ],
-              ),
+          ),
+          Expanded(
+            flex: 2, // Smaller space for second row
+            child: Row(
+              children: [
+                buildSoundButton(
+                  'GAK TAHU',
+                  'gak_tahu', 
+                  color: const Color(0xFFFF00FF),
+                  icon: Icons.question_mark_rounded,
+                ),
+                buildSoundButton(
+                  'TUNGGU', 
+                  'tunggu', 
+                  color: const Color(0xFFFFFF00),
+                  icon: Icons.timer,
+                ),
+                buildSoundButton(
+                  'STOP', 
+                  'berhenti', 
+                  color: const Color.fromARGB(255, 153, 138, 138),
+                  icon: Icons.stop_circle_outlined,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
